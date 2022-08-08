@@ -8,6 +8,7 @@ import { createRoot } from 'react-dom/client'
 import {StrictMode} from 'react';
 import '../../common';
 import {a} from './tree-shaking'
+// import 'babel-polyfill'
 
 const container = document.getElementsByClassName('css')[0]
 const root = createRoot(container)

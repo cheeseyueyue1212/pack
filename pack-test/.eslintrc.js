@@ -39,26 +39,5 @@ module.exports = {
     "arguments": true,
     "BigInt": true,
     "mbcAccount": true,
-  },
-  "rules": {
-    "semi": "error"
-    "indent": [
-      "error",
-      4,
-      { "SwitchCase": 1 }
-    ],
-    "no-undef": 2,
-    "no-mixed-operators": 0,
-    "camelcase": 0,
-    "standard/no-callback-literal": 0,
-    "no-useless-escape": 0,
-    "no-useless-call": 0,
-    "no-unused-vars": 0,
-    "import/export": 0,
-    "handle-callback-err": 0,
-    "no-eval": 0,
-    "new-cap": 0,
-    "no-constant-condition": 0,
-    "no-proto": 0
   }
 };

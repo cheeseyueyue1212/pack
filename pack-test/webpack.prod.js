@@ -23,6 +23,16 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 // 日志信息样式
 const FriendlyErrorsWebpackPlugin = require('@soda/friendly-errors-webpack-plugin')
 
+// 速度分析
+const SpeedMeasureWebpackPlugin = require('speed-measure-webpack-plugin')
+const smp = new SpeedMeasureWebpackPlugin();
+
+// 体积分析工具
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+// webpack 5 支持cache, 不需要再处理
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+
 
 const setMPF = () => {
   const entry = {};
@@ -67,7 +77,7 @@ const setMPF = () => {
 const {entry, htmlWebpackPlugins}  = setMPF()
 
 
-module.exports = {
+module.exports = smp.wrap({
   // 配置入口文件 entry
   entry,
   output: {
@@ -111,7 +121,16 @@ module.exports = {
     }
   ]},
       {test: /\.js$/, 'exclude': /node_modules/, use: [
-        'babel-loader'
+        {
+          // 打包速度优化 （多线程
+          loader: 'thread-loader',
+          options: {
+            workers: 3
+          },
+        },
+        {
+          loader: 'babel-loader'
+        }
       ]},
       {test: /\.(png|jpg|gif|jpeg)$/, use: [
         {
@@ -139,10 +158,16 @@ module.exports = {
       filename: '[name]_[contenthash:8].css'
     }),
 
+    // new BundleAnalyzerPlugin(),
     // 清除dist文件夹
     // new CleanWebpackPlugin(),
 
     new FriendlyErrorsWebpackPlugin(),
+
+    //分包
+    new webpack.DllReferencePlugin({
+      manifest: require('./build/library/library.json')
+    }),
 
     // 构建异常捕获 可以用来上报
     function() {
@@ -178,8 +203,10 @@ module.exports = {
   optimization: {
     runtimeChunk: 'single',
     minimizer: [
-      // js压缩
-      new TerserPlugin(),
+      // js压缩(并行压缩)  速度优化
+      new TerserPlugin({
+        parallel: true
+      }),
       // css压缩
       new CssMinimizerPlugin()
     ],
@@ -214,4 +241,4 @@ module.exports = {
 
   devtool: 'source-map',
   // stats: 'errors-only'
-}
+})
