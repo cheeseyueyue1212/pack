@@ -4,7 +4,7 @@
 // import './index.less'
 // import logo from './images/logo.png'
 // import sv from './images/sv.svg'
-// import { createRoot } from 'react-dom/client'
+// import ReactDom from 'react-dom'
 // import { StrictMode, React } from 'react';
 // import '../../common';
 // import {a} from './tree-shaking'
@@ -16,7 +16,7 @@ const { StrictMode, React } = require('react')
 const createRoot = require('react-dom/client')
 
 const container = document.getElementsByClassName('css')[0]
-const root = createRoot(container)
+const root = ReactDom.createRoot(container)
 
 
 

@@ -31,8 +31,13 @@ const smp = new SpeedMeasureWebpackPlugin();
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 // webpack 5 支持cache, 不需要再处理
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin')
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+// css tree shaking
+const PurgecssWebpackPlugin = require('purgecss-webpack-plugin');
 
+const PATHS = {
+  src: path.join(__dirname, 'src')
+}
 
 const setMPF = () => {
   const entry = {};
@@ -120,23 +125,51 @@ module.exports = smp.wrap({
       }
     }
   ]},
-      {test: /\.js$/, 'exclude': /node_modules/, use: [
-        {
-          // 打包速度优化 （多线程
-          loader: 'thread-loader',
-          options: {
-            workers: 3
+      {
+        test: /\.js$/,
+        include: path.resolve('src'),
+        exclude: /node_modules/,
+        use: [
+          {
+            // 打包速度优化 （多线程
+            loader: 'thread-loader',
+            options: {
+              workers: 3
+            },
           },
-        },
-        {
-          loader: 'babel-loader'
-        }
-      ]},
+          {
+            loader: 'babel-loader'
+          }
+        ]
+    },
       {test: /\.(png|jpg|gif|jpeg)$/, use: [
         {
           loader: 'file-loader',
           options: {
             name: '[name]_[hash:8].[ext]'
+          }
+        },
+        {
+          // 图片压缩
+          loader: 'image-webpack-loader',
+          options: {
+            mozjpeg: {
+              progressive: true,
+              quality: 65
+            },
+            optipng: {
+              enabled: false,
+            },
+            pngquant: {
+              quality: [0.65, 0.9],
+              speed: 4
+            },
+            gifsicle: {
+              interlaced: false
+            },
+            webp: {
+              quality: 75
+            }
           }
         }
       ]},
@@ -167,6 +200,10 @@ module.exports = smp.wrap({
     //分包
     new webpack.DllReferencePlugin({
       manifest: require('./build/library/library.json')
+    }),
+
+    new PurgecssWebpackPlugin({
+      paths: glob.sync(`${PATHS.src}/**/*`, {nodir: true})
     }),
 
     // 构建异常捕获 可以用来上报
@@ -240,5 +277,14 @@ module.exports = smp.wrap({
   },
 
   devtool: 'source-map',
-  // stats: 'errors-only'
+  // stats: 'errors-only',
+  // resolve: {
+  // 感觉反而变慢（wepack5中
+  //   alias: {
+  //     'react': path.resolve(__dirname, './node_modules/react/umd/react.production.min.js'),
+  //     'react-dom': path.resolve(__dirname, './node_modules/react-dom/umd/react-dom.production.min.js')
+  //   },
+  //   extensions: ['.js'],
+  //   mainFields: ['main']
+  // }
 })

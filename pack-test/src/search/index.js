@@ -3,15 +3,16 @@
 import React from 'react';
 import './index.less'
 import logo from './images/logo.png'
+import test from './images/test.png'
 import sv from './images/sv.svg'
-import { createRoot } from 'react-dom/client'
+import ReactDom from 'react-dom'
 import {StrictMode} from 'react';
 import '../../common';
 import {a} from './tree-shaking'
 // import 'babel-polyfill'
 
 const container = document.getElementsByClassName('css')[0]
-const root = createRoot(container)
+const root = ReactDom.createRoot(container)
 
 const loadComponent = () => {
   import ('./text').then((Text)=> {
@@ -24,6 +25,7 @@ root.render(
     <div className='search-text'>Search121 Text lalallaall13131alalal{a}
         <img src={ logo } onClick={loadComponent}></img>
         <img src={ sv }></img>
+        <img src={ test }></img>
       </div>
   </StrictMode>
 )
